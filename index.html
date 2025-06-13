@@ -19,7 +19,7 @@
       const raw = document.getElementById('wlcIps').value;
       const ips = raw.split('\n').map(ip => ip.trim()).filter(Boolean);
 
-      const res = await fetch('https://your-app.onrender.com/generate', {
+      const res = await fetch('https://ciscoutil-1.onrender.com/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ wlc_ips: ips })
