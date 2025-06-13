@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DHCP Option 43 Generator</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 2em; }
+    input, button, textarea { display: block; width: 100%; margin-top: 1em; }
+  </style>
+</head>
+<body>
+  <h1>DHCP Option 43 Generator</h1>
+  <textarea id="wlcIps" rows="6" placeholder="Enter up to 16 WLC IPs, one per line..."></textarea>
+  <button onclick="generate()">Generate</button>
+  <pre id="output"></pre>
+
+  <script>
+    async function generate() {
+      const raw = document.getElementById('wlcIps').value;
+      const ips = raw.split('\n').map(ip => ip.trim()).filter(Boolean);
+
+      const res = await fetch('https://your-app.onrender.com/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ wlc_ips: ips })
+      });
+
+      const result = await res.json();
+      document.getElementById('output').textContent = result.option43 || result.error;
+    }
+  </script>
+</body>
+</html>
