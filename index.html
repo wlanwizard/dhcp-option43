@@ -32,7 +32,7 @@
       const ips = raw.split('\n').map(ip => ip.trim()).filter(Boolean);
 
       const output = document.getElementById('output');
-      output.textContent = "⏳ Generating...";
+      output.textContent = "⏳ Generating...(spinning up backend - might take a 30 seconds, be patient)";
 
       try {
         const res = await fetch('https://ciscoutil-1.onrender.com/generate', {
