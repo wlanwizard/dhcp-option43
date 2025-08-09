@@ -20,19 +20,36 @@
       Generate Option 43
     </button>
 
-    <div>
-      <h2 class="text-sm font-medium text-gray-700 mb-1">Generated HEX Output:</h2>
+    <div class="space-y-2">
+      <div class="flex items-center justify-between">
+        <h2 class="text-sm font-medium text-gray-700">Generated HEX Output:</h2>
+        <button id="copyHex" class="text-xs px-2 py-1 rounded border hover:bg-gray-50">Copy</button>
+      </div>
       <pre id="output" class="bg-gray-100 p-3 rounded-md overflow-x-auto text-sm text-blue-700"></pre>
+    </div>
+
+    <div class="space-y-2">
+      <div class="flex items-center justify-between">
+        <h2 class="text-sm font-medium text-gray-700">Cisco IOS DHCP Config:</h2>
+        <button id="copyCli" class="text-xs px-2 py-1 rounded border hover:bg-gray-50">Copy</button>
+      </div>
+      <pre id="cli" class="bg-gray-100 p-3 rounded-md overflow-x-auto text-sm"></pre>
     </div>
   </div>
 
   <script>
+    const output = document.getElementById('output');
+    const cli = document.getElementById('cli');
+    const copyHexBtn = document.getElementById('copyHex');
+    const copyCliBtn = document.getElementById('copyCli');
+
     async function generate() {
       const raw = document.getElementById('wlcIps').value;
       const ips = raw.split('\n').map(ip => ip.trim()).filter(Boolean);
 
-      const output = document.getElementById('output');
-      output.textContent = "⏳ Generating...(spinning up backend - might take a 30 seconds, be patient)";
+      // Reset UI
+      output.textContent = "⏳ Generating… (waking backend can take ~30s on free tier)";
+      cli.textContent = "";
 
       try {
         const res = await fetch('https://ciscoutil-1.onrender.com/generate', {
@@ -42,11 +59,35 @@
         });
 
         const data = await res.json();
-        output.textContent = data.option43 || `❌ Error: ${data.error}`;
+
+        if (res.ok && data.option43) {
+          output.textContent = data.option43;
+          cli.textContent = data.cisco_ios_dhcp_cli || "";
+        } else {
+          output.textContent = `❌ Error: ${data.error || 'Unknown error'}`;
+          cli.textContent = "";
+        }
       } catch (err) {
         output.textContent = `❌ Network error: ${err.message}`;
+        cli.textContent = "";
       }
     }
+
+    copyHexBtn.addEventListener('click', async () => {
+      const text = output.textContent.trim();
+      if (!text) return;
+      try { await navigator.clipboard.writeText(text); copyHexBtn.textContent = 'Copied!'; }
+      catch { copyHexBtn.textContent = 'Copy failed'; }
+      setTimeout(() => copyHexBtn.textContent = 'Copy', 1200);
+    });
+
+    copyCliBtn.addEventListener('click', async () => {
+      const text = cli.textContent.trim();
+      if (!text) return;
+      try { await navigator.clipboard.writeText(text); copyCliBtn.textContent = 'Copied!'; }
+      catch { copyCliBtn.textContent = 'Copy failed'; }
+      setTimeout(() => copyCliBtn.textContent = 'Copy', 1200);
+    });
   </script>
 </body>
 </html>
